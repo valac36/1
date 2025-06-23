@@ -1,0 +1,115 @@
+---Gui Created in GPT by VALX---
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local hrp = nil
+local noLimbo = false
+local guiName = "LimboGui"
+
+
+local function atualizarHRP()
+    local character = player.Character or player.CharacterAdded:Wait()
+    hrp = character:WaitForChild("HumanoidRootPart")
+end
+
+atualizarHRP()
+
+player.CharacterAdded:Connect(function()
+    atualizarHRP()
+end)
+
+
+local function gerarPosicaoLimbo()
+    local x = math.random(900000, 1000000) * (math.random(1, 2) == 1 and 1 or -1)
+    local y = math.random(900000, 1000000) * (math.random(1, 2) == 1 and 1 or -1)
+    local z = math.random(900000, 1000000) * (math.random(1, 2) == 1 and 1 or -1)
+    return Vector3.new(x, y, z)
+end
+
+
+RunService.RenderStepped:Connect(function()
+    if noLimbo and hrp then
+        local destino = gerarPosicaoLimbo()
+        hrp.CFrame = CFrame.new(destino)
+    end
+end)
+
+
+local function criarGUI()
+    if player.PlayerGui:FindFirstChild(guiName) then
+        return
+    end
+
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = guiName
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = player.PlayerGui
+
+  
+    local Button = Instance.new("TextButton")
+    Button.Parent = ScreenGui
+    Button.BackgroundColor3 = Color3.fromRGB(20, 20, 50)
+    Button.Position = UDim2.new(0.4, 0, 0.88, 0)
+    Button.Size = UDim2.new(0, 200, 0, 50)
+    Button.Font = Enum.Font.GothamBold
+    Button.Text = "LIMBO OFF"
+    Button.TextColor3 = Color3.fromRGB(170, 0, 255)
+    Button.TextSize = 26
+    Button.BorderSizePixel = 0
+
+  
+    local UIStroke = Instance.new("UIStroke")
+    UIStroke.Parent = Button
+    UIStroke.Thickness = 2
+    UIStroke.Color = Color3.fromRGB(170, 0, 255)
+    UIStroke.Transparency = 0
+    UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 12)
+    UICorner.Parent = Button
+
+   
+    local Label = Instance.new("TextLabel")
+    Label.Parent = ScreenGui
+    Label.BackgroundTransparency = 1
+    Label.Position = UDim2.new(0.4, 0, 0.84, 0)
+    Label.Size = UDim2.new(0, 200, 0, 20)
+    Label.Font = Enum.Font.Gotham
+    Label.Text = "By ValxScripter"
+    Label.TextColor3 = Color3.fromRGB(170, 0, 255)
+    Label.TextSize = 14
+
+    
+    Button.MouseButton1Click:Connect(function()
+        noLimbo = not noLimbo
+
+        if noLimbo then
+            Button.Text = "LIMBO ON"
+            Button.BackgroundColor3 = Color3.fromRGB(40, 0, 70)
+            UIStroke.Color = Color3.fromRGB(255, 0, 255)
+            Label.TextColor3 = Color3.fromRGB(255, 0, 255)
+            print("🌀 Modo LIMBO ATIVADO!")
+        else
+            Button.Text = "LIMBO OFF"
+            Button.BackgroundColor3 = Color3.fromRGB(20, 20, 50)
+            UIStroke.Color = Color3.fromRGB(170, 0, 255)
+            Label.TextColor3 = Color3.fromRGB(170, 0, 255)
+            print("✅ Modo LIMBO DESATIVADO! Voltando ao mapa!")
+            if hrp then
+                hrp.CFrame = CFrame.new(0, 50, 0)
+            end
+        end
+    end)
+end
+
+criarGUI()
+
+
+RunService.RenderStepped:Connect(function()
+    if not player.PlayerGui:FindFirstChild(guiName) then
+        criarGUI()
+    end
+end)
